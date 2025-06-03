@@ -4,14 +4,26 @@ import { auth } from "@clerk/nextjs/server";
 
 export async function GET() {
   try {
+    console.log('API: Fetching berita...');
+    
+    // Add CORS headers
+    const headers = {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    };
+
     const berita = await prisma.berita.findMany({
       orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json(berita);
+    
+    console.log('API: Found berita:', berita);
+    
+    return NextResponse.json(berita, { headers });
   } catch (error) {
-    console.error("Error fetching berita:", error);
+    console.error("API: Error fetching berita:", error);
     return NextResponse.json(
-      { error: "Failed to fetch berita" },
+      { error: "Failed to fetch berita", details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
